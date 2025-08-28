@@ -1,17 +1,4 @@
-FAYL = "malumotlar.txt"
-vazifalar = []
-
-def yuklash():
-    try:
-        with open(FAYL, "r", encoding="utf-8") as f:
-            return [q.rstrip("\n") for q in f]
-    except FileNotFoundError:
-        return []
-
-def saqlash():
-    with open(FAYL, "w", encoding="utf-8") as f:
-        for v in vazifalar:
-            f.write(v + "\n")
+import vazifa
 
 def menyu():
     print("\n--- Vazifalar ilovasi ---")
@@ -20,50 +7,49 @@ def menyu():
     print("3 - Vazifani o'chirish")
     print("0 - Chiqish")
 
-def vazifa_qoshish():
-    matn = input("Yangi vazifani kiriting: ").strip()
-    if not matn:
+def vazifa_qoshish(vazifalar):
+    matn = input("Yangi vazifani kiriting: ")
+    if vazifa.qoshish(vazifalar, matn):
+        print("✅ Vazifa qo'shildi.")
+    else:
         print("❗ Bo'sh vazifa qo'shib bo'lmaydi.")
-        return
-    vazifalar.append(matn)
-    print("✅ Vazifa qo'shildi.")
 
-def royxatni_korish():
-    if not vazifalar:
+def royxatni_korish(vazifalar):
+    lst = vazifa.royxat(vazifalar)
+    if not lst:
         print("Ro'yxat bo'sh.")
         return
-    for i, v in enumerate(vazifalar, start=1):
+    for i, v in enumerate(lst, start=1):
         print(f"{i}. {v}")
 
-def vazifa_ochirish():
-    if not vazifalar:
+def vazifa_ochirish(vazifalar):
+    if not vazifa.royxat(vazifalar):
         print("O'chirish uchun vazifa yo'q.")
         return
-    royxatni_korish()
+    royxatni_korish(vazifalar)
     raqam_str = input("O'chirish uchun vazifa raqamini kiriting: ").strip()
     if not raqam_str.isdigit():
         print("❗ Faqat raqam kiriting.")
         return
     raqam = int(raqam_str)
-    if 1 <= raqam <= len(vazifalar):
-        olingan = vazifalar.pop(raqam - 1)
-        print(f"🗑️ O'chirildi: {olingan}")
+    if vazifa.ochirish(vazifalar, raqam):
+        print("🗑️ Vazifa o'chirildi.")
     else:
         print("❗ Bunday raqamli vazifa yo'q.")
 
 if __name__ == "main":
-    vazifalar = yuklash()
+    vazifalar = vazifa.yuklash()
     while True:
         menyu()
         tanlov = input("Tanlovingizni kiriting: ")
         if tanlov == "1":
-            vazifa_qoshish()
+            vazifa_qoshish(vazifalar)
         elif tanlov == "2":
-            royxatni_korish()
+            royxatni_korish(vazifalar)
         elif tanlov == "3":
-            vazifa_ochirish()
+            vazifa_ochirish(vazifalar)
         elif tanlov == "0":
-            saqlash()
+            vazifa.saqlash(vazifalar)
             print("Vazifalar saqlandi. Dastur yakunlandi.")
             break
         else:
